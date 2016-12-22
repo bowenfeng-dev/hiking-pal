@@ -87,12 +87,12 @@
 
     function pubs() {
       pubnub = PUBNUB.init({
-        subscribe_key: 'demo',
+        subscribe_key: 'sub-c-aaa49242-c57e-11e6-b8a7-0619f8945a4f',
         ssl: true
       })
 
       pubnub.subscribe({
-        channel: "mmxgps",
+        channel: "moves",
         message: function(message, channel) {
           console.log(message)
           addWayPoint(message);
