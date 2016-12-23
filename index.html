@@ -42,6 +42,7 @@
     var colors = ['Red', 'Blue', 'Green', 'Orange', 'Purple', 'Black'];
     var colorIdx = 0;
     var current_hiking;
+    var bounds;
 
     // sets your location as default
     if (navigator.geolocation) {
@@ -79,9 +80,7 @@
         zoom: 15,
         center: {lat: lat, lng : lng, alt: 0}
       });
-
-      map_marker = new google.maps.Marker({position: {lat: lat, lng: lng}, map: map});
-      map_marker.setMap(map);
+      bounds = new google.maps.LatLngBounds();
     }
 
 
@@ -112,25 +111,35 @@
         return;
       }
 
-      lat = gps.lat
-      lng = gps.lng
+      lat = gps.lat;
+      lng = gps.lng;
+      var waypoint = new google.maps.LatLng(lat, lng)
 
       if (!sessions[session]) {
         var pl = new google.maps.Polyline({
-          geodesic: true,
+          //geodesic: true,
           strokeColor: nextColor(),
           strokeOpacity: 1.0,
           strokeWeight: 2
         });
+        var marker = new google.maps.Marker({position: {lat: lat, lng: lng}, map: map});
+
         pl.setMap(map);
-        sessions[session] = pl;
+        marker.setMap(map);
+
+        sessions[session] = {
+          name: name,
+          path: pl,
+          marker: marker
+        };
       }
 
-      map.setCenter({lat: lat, lng : lng, alt: 0})
-      map_marker.setPosition({lat: lat, lng : lng, alt: 0});
+      var hiker = sessions[session];
+      hiker.path.getPath().push(waypoint);
+      hiker.marker.setPosition({lat: lat, lng : lng, alt: 0});
 
-      var path = sessions[session].getPath();
-      path.push(new google.maps.LatLng(lat, lng));
+      bounds.extend(waypoint);
+      map.fitBounds(bounds);
     }
 
 
